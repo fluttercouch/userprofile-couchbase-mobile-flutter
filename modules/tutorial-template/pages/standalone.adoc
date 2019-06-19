@@ -1,0 +1,71 @@
+= User Profile Sample: Couchbase Lite Fundamentals
+
+== Introduction
+Couchbase Mobile brings the power of NoSQL to the edge. It is comprised of three components:
+
+. *Couchbase Lite*, an embedded, NoSQL JSON Document Style database for your mobile apps.
+. *Sync Gateway*, an internet-facing synchronization mechanism that securely syncs data between mobile clients and servers.
+. *Couchbase Server*, a highly scalable, distributed NoSQL database platform.
+
+Couchbase Mobile supports flexible deployment models. You can deploy
+
+* Couchbase Lite as a standalone embedded database within your mobile apps or,
+* Couchbase Lite enabled mobile clients with a Sync Gateway to synchronize data between your mobile clients or,
+* Couchbase Lite enabled clients with Sync Gateway to sync data between mobile clients and the Couchbase Server, which can persist data in the cloud (public or private).
+
+This tutorial will walk you through a very basic example of how you can use *Couchbase Lite 2.x in standalone mode* within your Flutter app for iOS and Android.
+
+You will learn the fundamentals of
+
+* Database operations
+* Document CRUD Operations
+
+====
+You can learn more about Coucbase Mobile link:https://developer.couchbase.com/mobile/[here]
+====
+
+== Prerequisites
+This tutorial assumes familiarity with building link:https://flutter.dev/[Flutter] apps using Dart.
+
+* iOS (9+)
+* Android (SDK 19+)
+
+== App Overview
+In this tutorial you will be working with an app that allows users to log in and make changes to their user profile information.
+
+User profile information is persisted as a `Document` in the local Couchbase Lite `Database`. When the user logs out and logs back in again, the profile information is loaded from the `Database`.
+
+== Installation
+=== Fetching App Source Code
+==== Option 1 : Git Clone
+
+* Clone the *standalone* branch of the `User Profile Demo` solution from GitHub. Assuming you have link:https://git-scm.com/downloads[Git] installed you can use the following command to clone the solution:
+
+[source, bash]
+----
+git clone -b standalone https://github.com/fluttercouch/userprofile-couchbase.mobile-flutter.git
+----
+
+==== Option 2: Download .zip
+* Download the `User Profile Demo` solution directly from link:https://github.com/fluttercouch/userprofile-couchbase-mobile-flutter/archive/standalone.zip[here]
+
+
+Once all of the solution bits have been retrieved you can verify the installation, and run the app!
+
+=== Try it out
+* Start _Android Studio_, select _Open a existing Android Studio project_ and navigate to the main project directory.
+* Start your preferred simulator or attach you device. For simulators you can choose between iOS Simulator (only if you are running MacOS) and Android simulator in the toolbar.
+* Run the app selecting _Run 'main.dart'_ from the _Run_ menu.
+* Verify that you see the login screen.
+
+== Project overview
+The User Profile demo app is a Flutter project that supports iOS and Android.
+
+The project is divided in several directory:
+
+* *android/* : it contains Android relative code. You can open this directory directly in Android Studio and modify Android relative options such as build.gradle and AndroidManifest.xml files.
+* *assets/* : it contains images and static files that will be bundle with the app.
+* *build/* : this directory is created after your first build and it contains the results of the build process.
+* *ios/* : it contains iOS relative code. You can open this directory directly in XCode and modify iOS relative options such as the Info.plist file, or the options of the package in the Runner section.
+* *lib/* : it contains all the Dart code of your project. It is where your Flutter code lives!
+* *pubspec.yaml*: it's the configuration file of the Flutter project. In here you can declare the project name, your dependecies and your assets.
