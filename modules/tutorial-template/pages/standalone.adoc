@@ -69,3 +69,56 @@ The project is divided in several directory:
 * *ios/* : it contains iOS relative code. You can open this directory directly in XCode and modify iOS relative options such as the Info.plist file, or the options of the package in the Runner section.
 * *lib/* : it contains all the Dart code of your project. It is where your Flutter code lives!
 * *pubspec.yaml*: it's the configuration file of the Flutter project. In here you can declare the project name, your dependecies and your assets.
+
+== Getting started with Couchbase Lite
+In order to use Couchbase Lite within a Flutter app you have to declare Fluttercouch as a dependency in your project. You have to edit your `pubspec.yaml` so that it seems like this, and then run `flutter packages get` in a terminal within the main project directory.
+
+[source, yaml]
+----
+dependencies:
+  flutter:
+    sdk: flutter
+  fluttercouch: ^0.5.0
+----
+
+Now that the `Fluttercouch` library has been imported in your project, you are ready to start taking advantage of a variety of features. However, before diving into the capabilities offered though `Fluttercouch` let's take a look at the foundations of Couchbase: data models and documents.
+
+== Data Model
+Couchbase Lite is a JSON Document Store. A `Document` is a logical collection of named fields and values. The values are any valid JSON types. While it is not required or enforced, it is a recommended practice to include a _"type"_ property that can serve as a namespace for related documents.
+
+=== The "User Profile" Document
+The app deals with a single `Document` with a _"type"_ property of _"user"_. The document ID is of the form _"user::<email>"_. An example of a document would be
+
+[source, json]
+----
+{
+    "type":"user",
+    "name":"Jane Doe",
+    "email":"jane.doe@earth.org",
+    "address":"101 Main Street"
+}
+----
+
+=== User Profile
+The _"user"_ `Document` is encoded to a class named _UserProfile_ that resides in the _lib/models/user_profile.dart_ file.
+
+[source, dart]
+----
+class UserProfile {
+  final String id;
+  final String name;
+  final String email;
+  final String address;
+  final String description;
+
+  UserProfile({this.id, this.name, this.email, this.address, this.description});
+}
+----
+
+== Basic Database Operations
+In this section, we will do a code walkthrough of the basic Database operations.
+
+=== Create / Open a Database
+When a user logs in, we create an empty Couchbase Lite database for the user if one does not exists.
+
+* Open the MainModel.dart file and locate the `Database` property. When the `Database` property is used for the first time Couchbase Lite database will be opened, or created if it does not already exist via the instantiantion of a new object.
