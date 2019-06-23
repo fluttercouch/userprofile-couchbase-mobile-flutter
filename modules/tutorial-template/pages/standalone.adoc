@@ -121,4 +121,97 @@ In this section, we will do a code walkthrough of the basic Database operations.
 === Create / Open a Database
 When a user logs in, we create an empty Couchbase Lite database for the user if one does not exists.
 
-* Open the MainModel.dart file and locate the `Database` property. When the `Database` property is used for the first time Couchbase Lite database will be opened, or created if it does not already exist via the instantiantion of a new object.
+* Open the my_model.dart file in _lib/_ and locate the `MyModel` class. In order to use it as a Fluttercouch feature provider you have to extend it with the Fluttercouch mix-in.
+
+[source, dart]
+----
+import 'package:fluttercouch/fluttercouch.dart';  # <1>
+
+class MyModel extends Object with Fluttercouch { # <2>
+
+  MyModel() {
+    
+  }
+
+}
+----
+<1> Import the library poiting to _fluttercouch.dart_ file: Dart will import automatically every parts of the library for you.
+<2> If your class doesn't yet extends any class in order to use mixins, you have to explicitly extends Object.
+
+* Create an `async` method to initialize or open your database. You can call it during the class initialization or as a standalone method. Then, choose a name for your database. Fluttercouch stores a reference to the database by that name. If it doesn't exists yet, Fluttercouch will create one for you. It it exists, it will be set as you default database for functions you'll call from that moment.
+
+[source, dart]
+----
+class MyModel extends Object with Fluttercouch {
+
+  static const MY_DATABASE = "myDatabaseName"
+
+  MyModel() {
+    initCouchbaseLite();
+  }
+
+  initCouchbaseLite() async { # <1>
+    await initDatabaseWithName(MY_DATABASE); # <2>
+  }
+
+}
+----
+<1> Don't initialize `Fluttercouch` directly into the class constructor, because during instantiation asynchronous call aren't allowed.
+<2> Init the database with a name of your choice. From now on, it will become your default database for further operations, and you'll use that name for referencing it in some instructions.
+
+////
+=== Listening to Database Changes
+MISSING FEATURE
+////
+
+=== Disposing of the Repository
+When a user logs out, we close the Couchbase Lite database associated with the user, deregister any data-base change listeners, and free up memory allocations.
+
+Open the _lib/my_model.dart_ file, and locate the `Dispose` method. Under the hood, `closeDatabase()` and `closeDatabaseWithName()` handles the removal of database listeners, removing various objects from memory, and closing the database. `Dispose` will be called after a user logs out.
+
+[source, dart]
+----
+dispose() async {
+  await closeDatabase(); # <1>
+  // await closeDatabaseWithName(MY_DATABASE);
+}
+----
+
+<1> Because we have only one registered database in our application, and after initialization is selected as default, we can simly call `closeDatabase()`. The two methods are identical, but you would prefer `closeDatabaseWithName()` if you have different databases.
+
+=== Try it out
+
+* The app can be tested using a simulator/emulator or device.
+* Log into the app with any username and password. Let's use the values _"demo@example.com"_ and _"password"_ for username and password fields respectively. If this is the first time that the user sign-in, a new Couchbase Lite database will be created. If not, the user's existing database will be opened.
+
+=== Confirmation of Results (iOS)
+
+* Confirm that the console log output has a message similar to the one below. In my example, I am logging in with a username of _"demo@example.com"_.
+* The above log message indicates the location of the database for the user.
+* Open the folder in your Finder app and verify that a dabase with name _"userprofile"_ exists for the user.
+
+
+== Document Operations
+Once a instance of the Couchbase Lite database is created/opened for the specific user, we can perform basic `Document` functions on the database. In this section, we will walkthrough the code that describes basic `Document` operations.
+
+=== Reading a Document
+Once the user logs in, the user is taken to the "Your Profile" screen. A request is made to load The "User Profile" Document for the user. When the user logs in the very first time, there would be no _user profile_ document for the user.
+
+* Open the _lib/my_model.dart_ file and locate the `userProfileDocId` definition. This document Id is constructed by prefixing the term "user::" to the name of the user.
+* The `UserProfileViewModel` is tasked with retrieving the profile for a logged in user. 
+* We try to fetch the document with specified `userProfileDocId` from the database.
+
+[source, dart]
+----
+    Document document = await getDocumentWithId(userProfileDocId);
+
+    if (document.isNotNull()) {
+      var userProfile = new UserProfile(
+        id: document.getString("id"),
+        name: document.getString("name"),
+        email: document.getString("email"),
+        address: document.getString("address"),
+      );
+    }
+----
+
