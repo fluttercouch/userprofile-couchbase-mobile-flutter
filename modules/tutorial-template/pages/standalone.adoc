@@ -3,7 +3,7 @@
 == Introduction
 Couchbase Mobile brings the power of NoSQL to the edge. It is comprised of three components:
 
-. *Couchbase Lite*, an embedded, NoSQL JSON Document Style database for your mobile apps.
+. *Couchbase Lite*, an embedded NoSQL JSON Document Style database for your mobile apps.
 . *Sync Gateway*, an internet-facing synchronization mechanism that securely syncs data between mobile clients and servers.
 . *Couchbase Server*, a highly scalable, distributed NoSQL database platform.
 
@@ -21,7 +21,7 @@ You will learn the fundamentals of
 * Document CRUD Operations
 
 ====
-You can learn more about Coucbase Mobile link:https://developer.couchbase.com/mobile/[here]
+You can learn more about Couchbase Mobile link:https://developer.couchbase.com/mobile/[here]
 ====
 
 == Prerequisites
@@ -78,7 +78,7 @@ In order to use Couchbase Lite within a Flutter app you have to declare Flutterc
 dependencies:
   flutter:
     sdk: flutter
-  fluttercouch: ^0.5.0
+  fluttercouch: ^1.0.0
 ----
 
 Now that the `Fluttercouch` library has been imported in your project, you are ready to start taking advantage of a variety of features. However, before diving into the capabilities offered though `Fluttercouch` let's take a look at the foundations of Couchbase: data models and documents.
@@ -207,7 +207,7 @@ Once the user logs in, the user is taken to the "Your Profile" screen. A request
 
     if (document.isNotNull()) {
       var userProfile = new UserProfile(
-        id: document.getString("id"),
+        id: document.id,
         name: document.getString("name"),
         email: document.getString("email"),
         address: document.getString("address"),
@@ -215,3 +215,69 @@ Once the user logs in, the user is taken to the "Your Profile" screen. A request
     }
 ----
 
+<1> Fetch an *immutable* copy of the `Document` from the database.
+<2> Create an instance of the UserProfile class.
+<3> Set the `email` property of the UserProfile with the username of the logged in user. *Note*: This value is not editable after it's initially saved.
+<4> If the document exists and is fetched successfully, a variety of methods exist that can be used to fetch members of the `Document`. Some examples are `getString` and `getFloat`.
+
+=== Creating / Updating a Document
+A The "User Profile" Document is created for the user when the user taps the "Done" button of the "Profile Screen" The function below applies whether you are creating a document or updating an existing version.
+
+* The `UserProfileViewModel` is tasked with setting values of a profile for a logged in user, and saving them to the database. It does this calling the toDocument() member of the class UserProfile.
+
+[source, dart]
+----
+bool success = saveDocument(userProfile.toDocument());
+----
+
+* Open the _lib/user_profile.dart_ file and locate the `toDocument` function.
+
+[source, dart]
+----
+public Document toDocument();
+----
+
+* We create a new *mutable* `Document`. By default, all APIs in Couchbase Lite deal with immutable objects, thereby making them *thread-safe* by desing. In order to mutate an object, you must explicitly get a mutable copy of the object. Use appropriate type-setters to set the various properties of the `Document`
+
+[source, dart]
+----
+MutableDocument mutableDocument = new MutableDocument(this.id);
+mutableDocument.setString("name", this.name);
+mutableDocument.setString("email", this.email);
+mutableDocument.setString("address", this.address);
+
+return mutableDocument;
+----
+
+=== Deleting a Document
+We don't delete a `Document` in this simple app. However, deletion of a document is pretty straightforward and this is how you would do it.
+
+[source, dart]
+----
+Document document = getDocumentWithId(id);
+
+if (document.isNotNull()) {
+  document.delete();
+}
+----
+
+=== Try it out
+* You should have followed the steps discussed in the "Try it out" section under Create / Open a Database
+* Enter a "name" for the user in the TextView and Tap "Done".
+* Confirm that you see an alert message "Successfully Updated Profile". The first time you update the profile screen, the Document will be created.
+* Now tap on the "Upload Image" button and select an image from the Photo Album. Tap "Done".
+* Confirm that you see an alert message "Successfully Updated Profile". The Document will be updated this time.
+* Tap "Log Off" and log out of the app.
+* Log back into the app with the same user email Id and password that you used earlier. In my example, I used _"demo@example.com"_ and _"password"_. So I will log in with those credentials again.
+* Confirm that you see the profile screen with the _name_ and _image_ values that you set earlier.
+
+== Learn More
+Congratulations on completing this tutorial!
+
+This tutorial walked you through a very basic example of how to get up and running with Couchbase Lite as a local-only, standalone embedded data store in your Flutter app, running on Android and iOS. If you want to learn more about Couchbase Mobile 2.x, check out the following links.
+
+=== Further Reading
+* link:https://www.couchbase.com/products/mobile[Introduction to Couchbase Mobile]
+* link:https://blog.couchbase.com/couchbase-mobile-2-0/[Couchbase Mobile 2.0 Overview]
+* link:https://developer.couchbase.com/documentation/mobile/2.0/couchbase-lite/index.html[Couchbase Lite Reference Guide]
+* link:https://blog.couchbase.com/category/couchbase-mobile/[Couchbase Mobile Blog]
